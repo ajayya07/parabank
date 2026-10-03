@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b1728">
+    <meta name="description" content="Explore a Python, Playwright, and pytest automation framework for the ParaBank demo banking application.">
+    <title>ParaBank Automation | Project Guide</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="ParaBank Automation home">
+        <span class="brand-mark" aria-hidden="true">P</span>
+        <span>ParaBank <span class="brand-light">Automation</span></span>
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="#features">What you'll learn</a>
+        <a href="#setup">Get started</a>
+        <a class="nav-github" href="https://github.com/ajayya07/parabank">View on GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="status-dot"></span> PYTHON · PLAYWRIGHT · PYTEST</p>
+          <h1>Learn test automation<br>with a <span>real banking flow.</span></h1>
+          <p class="hero-description">A practical, end-to-end browser and API testing framework for ParaBank. Explore reusable page objects, pytest fixtures, data-driven tests, and cross-browser CI—all in one approachable project.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#setup">Set it up <span aria-hidden="true">↓</span></a>
+            <a class="button button-secondary" href="https://github.com/ajayya07/parabank">Browse the source <span aria-hidden="true">↗</span></a>
+          </div>
+          <p class="hero-note">Practice project for a public demo application. Not a real bank.</p>
+        </div>
+        <div class="code-card" aria-label="Example command to run the test suite">
+          <div class="code-card-top"><span></span><span></span><span></span><small>terminal</small></div>
+          <pre><code><span class="code-muted"># create an isolated environment</span>
+python -m venv .venv
+
+<span class="code-muted"># install project dependencies</span>
+python -m pip install -r requirements.txt
+python -m playwright install
+
+<span class="code-muted"># run the suite</span>
+python -m pytest</code></pre>
+          <div class="code-card-footer"><span class="terminal-check">✓</span> Ready for your first test run</div>
+        </div>
+      </section>
+
+      <section class="metrics" aria-label="Project highlights">
+        <div><strong>Python</strong><span>Readable test code</span></div>
+        <div><strong>3 browsers</strong><span>Chromium · Firefox · WebKit</span></div>
+        <div><strong>UI + API</strong><span>One integrated suite</span></div>
+        <div><strong>GitHub Actions</strong><span>Automated CI workflow</span></div>
+      </section>
+
+      <section class="section" id="features">
+        <div class="section-heading">
+          <p class="eyebrow">A HANDS-ON LEARNING PROJECT</p>
+          <h2>Explore the full testing workflow.</h2>
+          <p>Start with a login check, then follow banking journeys through the UI and REST API.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <span class="feature-icon icon-blue" aria-hidden="true">◉</span>
+            <h3>Browser journeys</h3>
+            <p>Automate registration, login, account setup, transfers, bill payments, transaction searches, and loan requests.</p>
+            <a href="https://github.com/ajayya07/parabank/tree/main/tests">Explore UI tests <span aria-hidden="true">→</span></a>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon icon-green" aria-hidden="true">{ }</span>
+            <h3>REST API checks</h3>
+            <p>Use a shared requests client to check authentication, customer accounts, account details, and transaction responses.</p>
+            <a href="https://github.com/ajayya07/parabank/blob/main/tests/test_api.py">Explore API tests <span aria-hidden="true">→</span></a>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon icon-purple" aria-hidden="true">▦</span>
+            <h3>Reusable page objects</h3>
+            <p>Keep selectors and actions in focused page classes, separate from test intent and assertions.</p>
+            <a href="https://github.com/ajayya07/parabank/tree/main/pages">Explore page objects <span aria-hidden="true">→</span></a>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon icon-orange" aria-hidden="true">↗</span>
+            <h3>Continuous integration</h3>
+            <p>Run the suite across browser engines with GitHub Actions and keep HTML reports and failure artifacts.</p>
+            <a href="https://github.com/ajayya07/parabank/tree/main/.github/workflows">Explore workflows <span aria-hidden="true">→</span></a>
+          </article>
+        </div>
+      </section>
+
+      <section class="architecture">
+        <div class="section-heading">
+          <p class="eyebrow">HOW IT FITS TOGETHER</p>
+          <h2>Small pieces. Clear responsibilities.</h2>
+          <p>Tests describe behavior; fixtures handle setup; page objects own browser interactions.</p>
+        </div>
+        <div class="architecture-flow" aria-label="Test flow from pytest through page objects or API client to ParaBank">
+          <div class="flow-card"><span class="flow-number">01</span><strong>pytest tests</strong><small>Scenarios and assertions</small></div>
+          <span class="flow-arrow" aria-hidden="true">→</span>
+          <div class="flow-card"><span class="flow-number">02</span><strong>Fixtures &amp; clients</strong><small>Setup, config, HTTP</small></div>
+          <span class="flow-arrow" aria-hidden="true">→</span>
+          <div class="flow-card"><span class="flow-number">03</span><strong>Page objects / API</strong><small>UI actions and REST calls</small></div>
+          <span class="flow-arrow" aria-hidden="true">→</span>
+          <div class="flow-card flow-target"><span class="flow-number">04</span><strong>ParaBank</strong><small>Demo application</small></div>
+        </div>
+        <div class="folder-list">
+          <code>pages/</code><span>Reusable UI objects</span>
+          <code>tests/</code><span>UI and API scenarios</span>
+          <code>utils/</code><span>Configuration and helpers</span>
+          <code>test_data/</code><span>Data-driven inputs</span>
+        </div>
+      </section>
+
+      <section class="setup-section" id="setup">
+        <div class="setup-copy">
+          <p class="eyebrow">YOUR FIRST RUN</p>
+          <h2>Get started on your machine.</h2>
+          <p>Install Python 3.10+, clone the repository, install the packages listed in <code>requirements.txt</code>, and download Playwright’s browsers.</p>
+          <a class="text-link" href="https://github.com/ajayya07/parabank/blob/main/requirements.txt">See all Python dependencies <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="setup-tabs">
+          <div class="tab-bar"><span>Windows PowerShell</span><span>macOS / Linux</span></div>
+          <pre><code>git clone https://github.com/ajayya07/parabank.git
+cd parabank
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python -m playwright install
+Copy-Item .env.example .env
+python -m pytest</code></pre>
+          <div class="setup-divider"></div>
+          <p class="alt-setup">macOS / Linux: activate with <code>source .venv/bin/activate</code>; the install and test commands are the same.</p>
+        </div>
+      </section>
+
+      <section class="commands-section">
+        <div class="section-heading">
+          <p class="eyebrow">PICK A TEST RUN</p>
+          <h2>Explore at your own pace.</h2>
+        </div>
+        <div class="command-grid">
+          <div><span>Complete suite</span><code>python -m pytest</code></div>
+          <div><span>Browser tests</span><code>python -m pytest -m ui</code></div>
+          <div><span>REST API tests</span><code>python -m pytest -m api</code></div>
+          <div><span>Watch Chromium</span><code>python -m pytest --headed --browser chromium</code></div>
+        </div>
+        <p class="safety-note"><strong>Shared demo, isolated writes.</strong> Read-only checks use ParaBank’s public demo login. Tests that change banking data register a unique customer. ParaBank is a shared public service, and registered test customers remain on its server.</p>
+      </section>
+
+      <section class="hosting-callout">
+        <div>
+          <p class="eyebrow">SHARE THE GUIDE</p>
+          <h2>Host this project guide on GitHub Pages.</h2>
+          <p>Enable <strong>GitHub Actions</strong> as the Pages source in your repository settings. The deployment workflow publishes this site whenever <code>main</code> changes.</p>
+        </div>
+        <a class="button button-secondary" href="https://github.com/ajayya07/parabank#project-website">Hosting instructions <span aria-hidden="true">↗</span></a>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">P</span><span>ParaBank <span class="brand-light">Automation</span></span></a>
+      <p>Built for learning. Tested against the ParaBank demo application.</p>
+      <a href="https://parabank.parasoft.com/parabank/index.htm">Visit ParaBank <span aria-hidden="true">↗</span></a>
+    </footer>
+  </body>
+</html>
