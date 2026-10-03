@@ -85,7 +85,7 @@ The `docs/` directory contains a static learning site describing the project, it
 
 To enable hosting:
 
-1. Push the project to GitHub and open **Settings → Pages**.
+1. Push the project to GitHub and open **Settings -> Pages**.
 2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
 3. Push a change to `main`, or manually run the **Deploy project website** workflow from the **Actions** tab.
 
