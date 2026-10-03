@@ -78,3 +78,31 @@ State-changing UI tests register unique customers through the website. ParaBank 
 ## CI
 
 GitHub Actions runs UI tests against Chromium, Firefox, and WebKit sequentially to avoid overloading the public demo server. Read-only API checks run separately. Each UI run uploads an HTML report plus screenshots, video, and traces for failures.
+
+## Project website
+
+The `docs/` directory contains a static learning site describing the project, its architecture, and how to run the tests. It is deployed to GitHub Pages by `.github/workflows/pages.yml` whenever changes are pushed to `main`.
+
+To enable hosting:
+
+1. Push the project to GitHub and open **Settings → Pages**.
+2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
+3. Push a change to `main`, or manually run the **Deploy project website** workflow from the **Actions** tab.
+
+After the first successful deployment, the site is available at `https://ajayya07.github.io/parabank/`. When using a fork, replace `ajayya07` with your GitHub username and `parabank` with the repository name. GitHub Pages hosts the project guide only; the tests themselves run on your computer or in GitHub Actions against the configured ParaBank application.
+
+## Install on your computer
+
+`requirements.txt` lists the Python packages needed to run this project. With Python 3.10 or newer installed, clone the repository and run these commands from its root:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m playwright install
+Copy-Item .env.example .env
+python -m pytest
+```
+
+On macOS/Linux, activate the virtual environment with `source .venv/bin/activate`; the remaining commands are the same. `python -m playwright install` downloads the browser binaries. To install only the browser you need, use `python -m playwright install chromium` (or `firefox` or `webkit`). See the [project website](docs/index.html) for a guided overview and additional test commands.
