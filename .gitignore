@@ -8,5 +8,6 @@ reports/
 test-results/
 playwright-report/
 *.html
+!docs/index.html
 .coverage
 htmlcov/
