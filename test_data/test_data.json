@@ -1,0 +1,12 @@
+{
+  "account_types": ["CHECKING", "SAVINGS"],
+  "invalid_login": {
+    "username": "invalid-user",
+    "password": "invalid-password"
+  },
+  "transfer_amount": "5.00",
+  "bill_payment_amount": "2.50",
+  "loan_amount": "100.00",
+  "loan_down_payment": "25.00",
+  "transaction_search_amount": "0.00"
+}
