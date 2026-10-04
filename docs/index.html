@@ -148,6 +148,21 @@ python -m pytest</code></pre>
         <p class="safety-note"><strong>Shared demo, isolated writes.</strong> Read-only checks use ParaBank’s public demo login. Tests that change banking data register a unique customer. ParaBank is a shared public service, and registered test customers remain on its server.</p>
       </section>
 
+      <section class="section" id="local-ai">
+        <div class="section-heading">
+          <p class="eyebrow">OPTIONAL · OPEN SOURCE · LOCAL</p>
+          <h2>Learn with local AI helpers.</h2>
+          <p>Install Ollama and run a local model to explain pytest failures, draft test ideas, or suggest Playwright locators. These tools are optional; they never edit or execute tests automatically.</p>
+        </div>
+        <div class="command-grid">
+          <div><span>Download a small example model</span><code>ollama pull qwen2.5-coder:3b</code></div>
+          <div><span>Explain a saved pytest report</span><code>python -m ai_assistant explain --junit reports/ui-results.xml</code></div>
+          <div><span>Draft test ideas</span><code>python -m ai_assistant generate-tests --feature "Customer transfers funds"</code></div>
+          <div><span>Suggest locator alternatives</span><code>python -m ai_assistant suggest-locator --failure-file reports/error.txt --dom-file reports/dom.html</code></div>
+        </div>
+        <p class="safety-note"><strong>Local inference, review required.</strong> The assistant connects only to Ollama on your local machine and masks common sensitive values where possible. Sanitization is not guaranteed; review your input files and all AI suggestions.</p>
+      </section>
+
       <section class="hosting-callout">
         <div>
           <p class="eyebrow">SHARE THE GUIDE</p>

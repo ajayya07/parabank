@@ -26,6 +26,7 @@ utils/                  Environment configuration, REST client, and shared helpe
 conftest.py             Browser, API, and test-customer fixtures
 pytest.ini              pytest and browser artifact defaults
 requirements.txt        Python dependencies
+ai_assistant/           Optional local Ollama-based learning and debugging tools
 ```
 
 ## Setup
@@ -60,6 +61,37 @@ pytest -m ui --html=reports/ui-report.html --self-contained-html
 ```
 
 `pytest.ini` is the pytest-playwright configuration entry point; the Python Playwright pytest plugin does not consume the Node.js `playwright.config.py` format.
+
+## Optional local AI learning tools
+
+The optional `ai_assistant` package provides three Ollama-backed helpers: summarize pytest failures, draft test cases from a feature description, and suggest Playwright locators from a failure and DOM snapshot. It does not edit tests, execute generated cases, or automatically replace locators. The standard test suite does not need Ollama and continues to run if it is not installed.
+
+Install and start [Ollama](https://ollama.com/) locally, then download a model. For example:
+
+```powershell
+ollama pull qwen2.5-coder:3b
+```
+
+Ollama's local server normally listens on `http://127.0.0.1:11434`. The assistant only accepts loopback HTTP URLs, so it will not send logs or DOM snapshots to a remote model endpoint. The model runs on your computer and needs disk space and memory. Model weights have their own license; review the selected model's license before use. AI output can be incorrect and should be reviewed.
+
+With the project virtual environment active, or using `.\.venv\Scripts\python.exe` on Windows:
+
+```powershell
+# Run tests and save failures in JUnit XML
+New-Item -ItemType Directory -Force reports
+python -m pytest -m "ui and not stateful" --junitxml=reports/ui-results.xml
+
+# Ask the local model to explain failures
+python -m ai_assistant explain --junit reports/ui-results.xml --output ai-output/failure-explanation.json
+
+# Draft test cases from a feature description
+python -m ai_assistant generate-tests --feature "A customer can transfer funds between their own accounts" --output ai-output/transfer-test-ideas.json
+
+# Ask for locator alternatives using a saved failure and DOM snapshot
+python -m ai_assistant suggest-locator --failure-file reports/locator-error.txt --dom-file reports/dom-snapshot.html --output ai-output/locator-suggestions.json
+```
+
+The JUnit parser reports an error when there are no test failures to explain. Locator snapshots should be limited to the relevant section of the page. The assistant removes common credentials and personal-data patterns and masks HTML input values as a precaution; sanitization is best-effort, so review local artifacts and remove sensitive information before using the tools.
 
 ## Configuration
 

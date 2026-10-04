@@ -5,6 +5,7 @@ __pycache__/
 .pytest_cache/
 .env
 reports/
+ai-output/
 test-results/
 playwright-report/
 *.html
