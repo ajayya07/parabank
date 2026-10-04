@@ -51,7 +51,6 @@ def api_client(settings: Settings) -> Iterator[ParaBankApiClient]:
 
 @pytest.fixture
 def random_customer() -> dict[str, str]:
-    unique_suffix = uuid4().hex[:10]
     return {
         "first_name": fake.first_name(),
         "last_name": fake.last_name(),
@@ -61,7 +60,7 @@ def random_customer() -> dict[str, str]:
         "zip_code": fake.postcode(),
         "phone": fake.numerify("##########"),
         "ssn": fake.numerify("###-##-####"),
-        "username": f"pw_{unique_suffix}",
+        "username": f"pw_{uuid4().hex}",
         "password": f"Pw{uuid4().hex[:14]}!",
     }
 
