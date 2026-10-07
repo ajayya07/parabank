@@ -7,6 +7,7 @@ import sys
 
 import requests
 
+from ai_assistant.client import OllamaCloudClient
 from ai_assistant.failure_explainer import explain_failures
 from ai_assistant.locator_assistant import suggest_locators
 from ai_assistant.test_case_generator import generate_test_cases
@@ -47,6 +48,11 @@ def build_parser() -> argparse.ArgumentParser:
     source.add_argument("--feature", help="Feature description text")
     source.add_argument("--feature-file", type=Path)
     generate.add_argument("--output", type=Path)
+    generate.add_argument(
+        "--cloud",
+        action="store_true",
+        help="Use Ollama Cloud for test generation (feature prompt is sent to Ollama)",
+    )
 
     locator = commands.add_parser(
         "suggest-locator", help="Suggest locators from a failure and DOM snapshot"
@@ -72,7 +78,8 @@ def main() -> int:
                 if args.feature is not None
                 else _read_text(args.feature_file)
             )
-            result = generate_test_cases(description)
+            client = OllamaCloudClient() if args.cloud else None
+            result = generate_test_cases(description, client)
         else:
             failure = (
                 args.failure

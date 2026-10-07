@@ -1,11 +1,10 @@
 import json
 from pathlib import Path
-from types import SimpleNamespace
 
 import pytest
 import requests
 
-from ai_assistant.client import OllamaClient
+from ai_assistant.client import OllamaClient, OllamaCloudClient
 from ai_assistant.failure_explainer import explain_failures
 from ai_assistant.locator_assistant import suggest_locators
 from ai_assistant.sanitize import sanitize_dom, sanitize_text
@@ -77,6 +76,53 @@ def test_ollama_client_posts_json_schema_to_local_chat_api(
     messages = request_body["messages"]
     assert isinstance(messages, list)
     assert "alice" not in messages[1]["content"]
+
+
+def test_cloud_client_requires_api_key_and_model(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("OLLAMA_API_KEY", raising=False)
+    monkeypatch.delenv("OLLAMA_CLOUD_MODEL", raising=False)
+    with pytest.raises(ValueError, match="OLLAMA_API_KEY"):
+        OllamaCloudClient()
+
+    monkeypatch.setenv("OLLAMA_API_KEY", "test-key")
+    with pytest.raises(ValueError, match="OLLAMA_CLOUD_MODEL"):
+        OllamaCloudClient()
+
+
+def test_cloud_client_posts_json_prompt_to_fixed_ollama_endpoint(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: dict[str, object] = {}
+
+    class FakeResponse:
+        def raise_for_status(self) -> None:
+            return None
+
+        def json(self) -> dict[str, object]:
+            return {"message": {"content": '{"test_cases":[]}'}}
+
+    def fake_request(url: str, **kwargs: object) -> FakeResponse:
+        captured["url"] = url
+        captured.update(kwargs)
+        return FakeResponse()
+
+    monkeypatch.setattr(requests, "post", fake_request)
+    client = OllamaCloudClient(api_key="test-key", model="cloud-model")
+    result = client.ask_for_json(
+        system="system",
+        prompt="feature description",
+        schema={"type": "object"},
+    )
+
+    assert result == {"test_cases": []}
+    assert captured["url"] == "https://ollama.com/api/chat"
+    assert captured["headers"] == {"Authorization": "Bearer test-key"}
+    request_body = captured["json"]
+    assert isinstance(request_body, dict)
+    assert "format" not in request_body
+    assert "JSON schema" in request_body["messages"][0]["content"]
 
 
 def test_sanitize_text_redacts_credentials_and_personal_details() -> None:
@@ -180,3 +226,33 @@ def test_cli_output_is_valid_json(tmp_path: Path) -> None:
     output = tmp_path / "drafts" / "cases.json"
     _write_or_print({"cases": []}, output)
     assert json.loads(output.read_text(encoding="utf-8")) == {"cases": []}
+
+
+def test_cli_cloud_flag_uses_cloud_only_for_test_generation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import sys
+
+    import ai_assistant.__main__ as cli
+
+    created_clients: list[object] = []
+    supplied_clients: list[object] = []
+
+    class FakeCloudClient:
+        def __init__(self) -> None:
+            created_clients.append(self)
+
+    def fake_generate(description: str, client=None) -> list[dict[str, str]]:
+        supplied_clients.append(client)
+        return [{"title": description}]
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["ai_assistant", "generate-tests", "--cloud", "--feature", "transfer"],
+    )
+    monkeypatch.setattr(cli, "OllamaCloudClient", FakeCloudClient)
+    monkeypatch.setattr(cli, "generate_test_cases", fake_generate)
+
+    assert cli.main() == 0
+    assert supplied_clients == created_clients

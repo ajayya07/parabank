@@ -3,11 +3,18 @@ from __future__ import annotations
 import ipaddress
 import json
 import os
+from typing import Protocol
 from urllib.parse import urlsplit
 
 import requests
 
 from ai_assistant.sanitize import sanitize_text
+
+
+class JsonChatClient(Protocol):
+    def ask_for_json(
+        self, *, system: str, prompt: str, schema: dict[str, object]
+    ) -> dict[str, object]: ...
 
 
 class OllamaClient:
@@ -71,6 +78,10 @@ class OllamaClient:
             },
             timeout=self.timeout_seconds,
         )
+        return self._parse_json_response(response)
+
+    @staticmethod
+    def _parse_json_response(response: requests.Response) -> dict[str, object]:
         response.raise_for_status()
         try:
             content = response.json()["message"]["content"]
@@ -80,6 +91,65 @@ class OllamaClient:
         if not isinstance(result, dict):
             raise ValueError("Ollama response must be a JSON object")
         return result
+
+
+class OllamaCloudClient:
+    """Direct Ollama Cloud client, intended for test-case generation only."""
+
+    API_URL = "https://ollama.com/api/chat"
+
+    def __init__(
+        self,
+        *,
+        api_key: str | None = None,
+        model: str | None = None,
+        timeout_seconds: float | None = None,
+    ) -> None:
+        self.api_key = api_key or os.getenv("OLLAMA_API_KEY")
+        self.model = model or os.getenv("OLLAMA_CLOUD_MODEL")
+        self.timeout_seconds = (
+            timeout_seconds
+            if timeout_seconds is not None
+            else float(os.getenv("OLLAMA_TIMEOUT_SECONDS", "120"))
+        )
+        if not self.api_key:
+            raise ValueError(
+                "Set OLLAMA_API_KEY to use Ollama Cloud; keep it out of source control"
+            )
+        if not self.model:
+            raise ValueError(
+                "Set OLLAMA_CLOUD_MODEL to a model available in your Ollama Cloud account"
+            )
+        if self.timeout_seconds <= 0:
+            raise ValueError("OLLAMA_TIMEOUT_SECONDS must be greater than zero")
+
+    def ask_for_json(
+        self, *, system: str, prompt: str, schema: dict[str, object]
+    ) -> dict[str, object]:
+        schema_json = json.dumps(schema, separators=(",", ":"))
+        response = requests.post(
+            self.API_URL,
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            json={
+                "model": self.model,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": sanitize_text(
+                            system
+                            + "\nReturn only a valid JSON object. Follow this JSON "
+                            "schema exactly:\n"
+                            + schema_json
+                        ),
+                    },
+                    {"role": "user", "content": sanitize_text(prompt)},
+                ],
+                "stream": False,
+                "options": {"temperature": 0.2},
+            },
+            timeout=self.timeout_seconds,
+        )
+        return OllamaClient._parse_json_response(response)
 
 
 def require_string_list(

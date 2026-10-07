@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ai_assistant.client import OllamaClient, require_string_list
+from ai_assistant.client import JsonChatClient, OllamaClient, require_string_list
 from ai_assistant.sanitize import sanitize_text
 
 TEST_CASE_SCHEMA: dict[str, object] = {
@@ -39,7 +39,7 @@ TEST_CASE_FIELDS = (
 
 
 def generate_test_cases(
-    feature_description: str, client: OllamaClient | None = None
+    feature_description: str, client: JsonChatClient | None = None
 ) -> list[dict[str, str]]:
     description = sanitize_text(feature_description.strip(), limit=8_000)
     if not description:

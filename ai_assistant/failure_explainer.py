@@ -3,7 +3,7 @@ from __future__ import annotations
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from ai_assistant.client import OllamaClient
+from ai_assistant.client import JsonChatClient, OllamaClient
 from ai_assistant.sanitize import sanitize_text
 
 FAILURE_SCHEMA: dict[str, object] = {
@@ -40,7 +40,7 @@ def read_junit_failures(path: Path) -> str:
 
 
 def explain_failures(
-    junit_path: Path, client: OllamaClient | None = None
+    junit_path: Path, client: JsonChatClient | None = None
 ) -> dict[str, object]:
     failure_text = read_junit_failures(junit_path)
     response = (client or OllamaClient()).ask_for_json(

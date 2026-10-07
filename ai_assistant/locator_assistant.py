@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ai_assistant.client import OllamaClient, require_string_list
+from ai_assistant.client import JsonChatClient, OllamaClient, require_string_list
 from ai_assistant.sanitize import sanitize_dom, sanitize_text
 
 LOCATOR_SCHEMA: dict[str, object] = {
@@ -27,7 +27,7 @@ LOCATOR_FIELDS = ("locator", "reason", "confidence")
 def suggest_locators(
     failure_description: str,
     dom_snapshot: str,
-    client: OllamaClient | None = None,
+    client: JsonChatClient | None = None,
 ) -> list[dict[str, str]]:
     failure = sanitize_text(failure_description.strip(), limit=4_000)
     dom = sanitize_dom(dom_snapshot, limit=12_000)
