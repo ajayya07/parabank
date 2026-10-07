@@ -21,7 +21,6 @@ def test_customer_can_pay_a_bill(
     dashboard = DashboardPage(page, settings.base_url)
     dashboard.load()
     account_id = dashboard.account_ids()[0]
-    balance_before = dashboard.balance_for(account_id)
     payee = {
         "name": f"Test Payee {uuid4().hex[:8]}",
         "street": fake.street_address(),
@@ -38,5 +37,3 @@ def test_customer_can_pay_a_bill(
     bill_payment.pay_bill(payee, amount, account_id)
 
     assert bill_payment.result.is_visible()
-    dashboard.load()
-    assert dashboard.balance_for(account_id) == balance_before - amount

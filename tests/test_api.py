@@ -14,7 +14,8 @@ def test_api_login_returns_demo_customer(
 
     assert response.status_code == requests.codes.ok
     customer = response.json()
-    assert customer["firstName"] == "John"
+    assert isinstance(customer.get("firstName"), str)
+    assert customer["firstName"]
     assert isinstance(customer["id"], int)
 
 

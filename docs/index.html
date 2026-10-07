@@ -112,6 +112,21 @@ python -m pytest</code></pre>
         </div>
       </section>
 
+      <section class="section" id="how-it-works">
+        <div class="section-heading">
+          <p class="eyebrow">LEARN THE EXECUTION FLOW</p>
+          <h2>Follow one test from pytest to the app.</h2>
+          <p>This structure separates test intent, reusable browser actions, and setup so each part is easier to learn and maintain.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card"><span class="flow-number">01 · DISCOVER</span><h3>Pytest finds tests</h3><p>It collects functions in <code>tests/test_*.py</code>. Markers such as <code>ui</code> and <code>api</code>, plus command-line filters, choose what runs.</p></article>
+          <article class="feature-card"><span class="flow-number">02 · PREPARE</span><h3>Fixtures provide setup</h3><p>Function parameters request reusable fixtures. For example, <code>demo_login</code> creates a read-only session; <code>registered_customer</code> attempts stateful registration.</p></article>
+          <article class="feature-card"><span class="flow-number">03 · INTERACT</span><h3>Page Objects use Playwright</h3><p>A page class holds selectors and actions. The Playwright <code>Page</code> fills fields, clicks controls, and waits for application responses.</p></article>
+          <article class="feature-card"><span class="flow-number">04 · VERIFY</span><h3>Assertions check behavior</h3><p>Tests use web-first <code>expect</code> checks and Python assertions. Pytest reports failures and retains browser evidence per <code>pytest.ini</code>.</p></article>
+        </div>
+        <p class="safety-note"><strong>Python ideas in this repo:</strong> functions and type hints, classes and inheritance, fixtures, JSON data, parameterization, HTTP sessions, locators, and <code>Decimal</code> for money calculations. A good reading path is <code>tests/test_login.py</code> → <code>conftest.py</code> → <code>pages/login_page.py</code>.</p>
+      </section>
+
       <section class="setup-section" id="setup">
         <div class="setup-copy">
           <p class="eyebrow">YOUR FIRST RUN</p>
@@ -124,13 +139,12 @@ python -m pytest</code></pre>
           <pre><code>git clone https://github.com/ajayya07/parabank.git
 cd parabank
 python -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-python -m playwright install
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m playwright install chromium
 Copy-Item .env.example .env
-python -m pytest</code></pre>
+.\.venv\Scripts\python.exe -m pytest -m api</code></pre>
           <div class="setup-divider"></div>
-          <p class="alt-setup">macOS / Linux: activate with <code>source .venv/bin/activate</code>; the install and test commands are the same.</p>
+          <p class="alt-setup">This uses the venv directly, so PowerShell execution-policy restrictions won't block setup. macOS/Linux: replace the Python path with <code>.venv/bin/python</code>. The full suite includes state-changing tests.</p>
         </div>
       </section>
 
@@ -144,8 +158,46 @@ python -m pytest</code></pre>
           <div><span>Browser tests</span><code>python -m pytest -m ui</code></div>
           <div><span>REST API tests</span><code>python -m pytest -m api</code></div>
           <div><span>Watch Chromium</span><code>python -m pytest --headed --browser chromium</code></div>
+          <div><span>Read-only UI checks</span><code>python -m pytest -m "ui and not stateful" -k "not invalid_credentials"</code></div>
+          <div><span>List tests without running them</span><code>python -m pytest --collect-only -q</code></div>
         </div>
         <p class="safety-note"><strong>Shared demo, isolated writes.</strong> Read-only checks use ParaBank’s public demo login. Tests that change banking data register a unique customer. ParaBank is a shared public service, and registered test customers remain on its server.</p>
+      </section>
+
+      <section class="architecture" id="scenarios">
+        <div class="section-heading">
+          <p class="eyebrow">WHAT THE SUITE COVERS</p>
+          <h2>From login to money movement.</h2>
+          <p>Read-only tests are safest against the shared demo. Stateful scenarios create customers and change data.</p>
+        </div>
+        <div class="folder-list">
+          <code>test_login.py</code><span>Demo login; invalid login (currently unreliable on the live demo); registration</span>
+          <code>test_accounts.py</code><span>Account overview plus checking/savings creation</span>
+          <code>test_transfer.py</code><span>Transfer between a customer's accounts and verify balances</span>
+          <code>test_bill_payment.py</code><span>Submit a bill payment and check completion confirmation</span>
+          <code>test_transactions.py</code><span>Search account activity by amount</span>
+          <code>test_loan.py</code><span>Submit a loan request and read Approved/Denied outcome</span>
+          <code>test_api.py</code><span>REST login, accounts, account details, and transactions</span>
+          <code>test_ai_assistant.py</code><span>Offline tests of AI client contracts; no model/network needed</span>
+        </div>
+        <p class="safety-note"><strong>Known demo limitations.</strong> ParaBank has accepted invalid credentials and reported generated usernames as already taken. These are behaviors of the shared public service, not proof that a browser or Python install is broken.</p>
+      </section>
+
+      <section class="section" id="local-ai">
+        <div class="section-heading">
+          <p class="eyebrow">OPTIONAL · LOCAL OR CLOUD</p>
+          <h2>AI help without using local model resources.</h2>
+          <p>Use Ollama Cloud only for test-case generation. It requires an Ollama API key, an available cloud model, and internet access, but no Ollama install or local model download.</p>
+        </div>
+        <div class="command-grid">
+          <div><span>Enter API key securely for this terminal</span><code>$secureKey = Read-Host "API key" -AsSecureString; $env:OLLAMA_API_KEY = [System.Net.NetworkCredential]::new("", $secureKey).Password</code></div>
+          <div><span>Choose an account-enabled cloud model</span><code>$env:OLLAMA_CLOUD_MODEL = "gemma4:31b"</code></div>
+          <div><span>Draft cases through Ollama Cloud</span><code>python -m ai_assistant generate-tests --cloud --feature "Customer transfers funds"</code></div>
+          <div><span>Save a draft locally</span><code>python -m ai_assistant generate-tests --cloud --feature "Customer transfers funds" --output ai-output/ideas.json</code></div>
+          <div><span>Failure explanations (local Ollama only)</span><code>python -m ai_assistant explain --junit reports/ui-results.xml</code></div>
+          <div><span>Locator suggestions (local Ollama only)</span><code>python -m ai_assistant suggest-locator --failure-file reports/error.txt --dom-file reports/dom.html</code></div>
+        </div>
+        <p class="safety-note"><strong>You can uninstall Ollama.</strong> Cloud test generation and regular tests still work without local Ollama. Only local failure/DOM analysis requires it. Cloud generation sends the feature prompt to Ollama; never include credentials or personal data. Usage may be subject to account limits or charges. AI suggestions need human review and are never executed automatically.</p>
       </section>
 
       <section class="hosting-callout">
